@@ -1,0 +1,572 @@
+{
+  "name": "Smart Resume Ranking System (AI-Powered)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1EHH9guf1iIIYbNe62wlMxOLfVlgsXkbD",
+          "mode": "list",
+          "cachedResultName": "ATS RESUME DRIVE",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1EHH9guf1iIIYbNe62wlMxOLfVlgsXkbD"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "036cc4c8-55b6-41e1-b48c-499d0352ce96",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Kvh8QdN18yIaiC6Q",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1Xjix3OquR7tJ9Lxx0ERmC9_ujAxC1HvX",
+          "mode": "list",
+          "cachedResultName": "My Resume(ATS Layout).pdf",
+          "cachedResultUrl": "https://drive.google.com/file/d/1Xjix3OquR7tJ9Lxx0ERmC9_ujAxC1HvX/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "335b3a8c-64a4-4079-b230-cb2e8e61f402",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Kvh8QdN18yIaiC6Q",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "aee75726-4f91-4f8e-adda-a97dfae867c3",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this resume.\n\nResume:\n\n{{$json.text}}\n\nReturn ONLY this JSON format.\n\n{\n  \"name\":\"\",\n  \"email\":\"\",\n  \"phone\":\"\",\n  \"education\":\"\",\n  \"experience\":\"\",\n  \"skills\":[],\n  \"certifications\":[],\n  \"score\":0,\n  \"rank\":\"\",\n  \"recommendation\":\"\",\n  \"summary\":\"\"\n}",
+        "options": {
+          "systemMessage": "You are an experienced HR recruiter.\n\nAnalyze the candidate's resume objectively.\n\nEvaluate the applicant based on:\n\n• Education\n• Technical Skills\n• Certifications\n• Work Experience\n• Communication Skills (if mentioned)\n• Overall suitability\n\nAssign:\n\n- Candidate Score (0-100)\n- Rank\n- Recommendation\n\nReturn ONLY valid JSON.\n\nDo not include markdown."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0bdfa4c4-bc70-41b4-bc0f-79d15facb30a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8a877a50-5f20-415c-81a1-c4bab39d10f0",
+              "leftValue": "={{$json.score}}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1280,
+        0
+      ],
+      "id": "57e1f954-1e7c-40e6-ae2d-f7059285bfe5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o",
+          "mode": "list",
+          "cachedResultName": "SRR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Summary": "={{$json.summary}}",
+            "Name": "={{$json.name}}",
+            "Timestamp": "={{$now.format('yyyy-MM-dd HH:mm')}}",
+            "Score": "={{$json.score}}",
+            "Rank": "={{$json.rank}}",
+            "Recommendation": "={{$json.recommendation}}",
+            "Email": "={{$json.email}}",
+            "Phone": "={{ $json.phone }}",
+            "Education": "={{ $json.education }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Education",
+              "displayName": "Education",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        -96
+      ],
+      "id": "a4dd8f4b-b7b3-47c9-9b45-ed0e0c0829f9",
+      "name": "Qualified Candidate",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gDYHfg7A9mxu9DjC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "5518864435",
+        "text": "=📄 Qualified Candidate Detected  \n👤 Name:  {{ $json.Name }}\n📧 Email: {{$json.Email}}  \n📱 Phone: {{$json.Phone}}  \n🎓 Education: {{$json.Education}}  \n⭐ Score: {{$json.Score}} / 100  \n🏆 Rank: {{$json.Rank}}  \n💼 Recommendation: {{$json.Recommendation}}  \n📝 Summary: {{$json.Summary}}  \n🤖 Evaluated automatically using Google Gemini + n8n.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        -96
+      ],
+      "id": "05be0c0f-15ff-420e-a21a-8a2d6e615c5c",
+      "name": "Qualified Chatbot",
+      "webhookId": "7337cacd-4217-4297-9014-5089b65cf6c1",
+      "credentials": {
+        "telegramApi": {
+          "id": "tIAm0G2N8ZfUxvIM",
+          "name": "Smart Resume Ranking System (AI-Powered)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o",
+          "mode": "list",
+          "cachedResultName": "SRR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1uLXxRkN5zoGYHfPVHEIuIJO_QXIk_gp6yIFXEnlI20o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{$now.format('yyyy-MM-dd HH:mm')}}",
+            "Name": "={{$json.name}}",
+            "Score": "={{ $json.score }}",
+            "Rank": "={{ $json.rank }}",
+            "Recommendation": "={{ $json.recommendation }}",
+            "Summary": "={{ $json.summary }}",
+            "Email": "={{ $json.email }}",
+            "Phone": "={{ $json.phone }}",
+            "Education": "={{ $json.education }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Education",
+              "displayName": "Education",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Rank",
+              "displayName": "Rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Recommendation",
+              "displayName": "Recommendation",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Summary",
+              "displayName": "Summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1536,
+        96
+      ],
+      "id": "606909a0-cbc9-429b-8524-c5c984fc2ba3",
+      "name": "Needs Review",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gDYHfg7A9mxu9DjC",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        496,
+        208
+      ],
+      "id": "2d8aac0c-5762-4f2c-a41e-fe355e1fd4e7",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "DCQRGMEQUhoaAPMU",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let output = $json.output;\n\nif (typeof output === \"string\") {\n  output = output\n    .replace(/```json/g, \"\")\n    .replace(/```/g, \"\")\n    .trim();\n}\n\nconst parsed = JSON.parse(output);\n\n// Prevent Google Sheets from treating phone numbers as formulas\nif (parsed.phone) {\n  parsed.phone = \"'\" + parsed.phone;\n}\n\nreturn [\n  {\n    json: parsed\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "20bccb82-e96b-4440-99c3-6728971a366a",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Qualified Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Needs Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualified Candidate": {
+      "main": [
+        [
+          {
+            "node": "Qualified Chatbot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "c471f4ef-4561-4f52-82ed-e5b460e9d7e6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9ff00ff5a0ab351fbd5a0e9b85a809f5fbe0b80a75ad48283dc333dfaa98b61b"
+  },
+  "nodeGroups": [],
+  "id": "io42c3kmqylgdFx6",
+  "tags": []
+}
