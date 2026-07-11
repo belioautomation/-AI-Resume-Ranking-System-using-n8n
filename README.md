@@ -1,99 +1,183 @@
-# 📄 AI Resume Ranking System using n8n
+# 📄 AI Resume Ranking System — n8n Automation
 
-An AI-powered recruitment automation workflow built with **n8n** and **Google Gemini AI**. This project automatically monitors a Google Drive folder for newly uploaded resumes, extracts resume content, evaluates each candidate using AI, assigns a score and ranking, stores the results in Google Sheets, and sends Telegram notifications for qualified applicants.
+An AI-powered recruitment automation workflow built using **n8n**, **Google Gemini AI**, **Google Drive**, **Google Sheets**, and **Telegram Bot API**.
 
-Developed as part of my **30-Day n8n Automation Portfolio**, this workflow demonstrates how AI can streamline resume screening and candidate evaluation.
+The system automatically monitors a resume upload folder, extracts candidate information from PDF files, evaluates applicants using AI, assigns qualification scores, ranks candidates, stores evaluation results, and notifies recruiters about qualified applicants.
 
----
+**Stack:**  
+n8n · Google Drive · Google Gemini AI · Google Sheets · Telegram Bot · JavaScript · Google Workspace API
 
-# 📌 Features
-
-* 📂 Monitors Google Drive for newly uploaded resumes
-* 📥 Downloads PDF resumes automatically
-* 📄 Extracts resume text for processing
-* 🤖 Evaluates candidates using Google Gemini AI
-* ⭐ Assigns AI-generated candidate scores
-* 🏆 Ranks applicants based on qualifications
-* 📊 Logs candidate evaluations to Google Sheets
-* 📲 Sends Telegram notifications for qualified applicants
-* 🧠 Uses structured JSON output for reliable workflow automation
 
 ---
 
-# 🛠 Technologies Used
+# 🎯 Project Overview
 
-* n8n
-* Google Drive Trigger
-* Google Drive
-* Extract From File
-* Google Gemini AI
-* Code Node (JSON Parser)
-* IF Node
-* Google Sheets API
-* Telegram Bot API
+## Problem
+
+Manual resume screening is time-consuming for recruiters because they need to:
+
+- Review hundreds of resumes
+- Extract candidate information manually
+- Compare qualifications
+- Rank applicants
+- Track evaluation results
+
+
+## Solution
+
+This project automates the recruitment screening process by creating an AI-powered pipeline:
+
+1. Recruiter uploads resumes to Google Drive
+2. n8n detects new resume files automatically
+3. Resume text is extracted from PDF files
+4. Google Gemini AI analyzes candidate qualifications
+5. AI generates candidate scores and recommendations
+6. Applicants are categorized based on score
+7. Results are stored in Google Sheets
+8. Telegram sends notifications for qualified candidates
+
 
 ---
 
-# 📂 Workflow
+# ✨ Features
 
-```text
+## Resume Processing
+
+✅ Automatic Google Drive monitoring  
+✅ PDF resume detection  
+✅ Resume text extraction  
+✅ Structured candidate information extraction  
+
+
+## AI Evaluation
+
+✅ Google Gemini AI resume analysis  
+✅ Candidate scoring system  
+✅ Qualification ranking  
+✅ Interview recommendation generation  
+✅ AI-generated candidate summary  
+
+
+## Automation
+
+✅ n8n trigger-based workflow  
+✅ Automated Google Sheets logging  
+✅ Telegram recruiter notifications  
+✅ JSON-based structured AI output  
+
+
+---
+
+# 🗺️ System Architecture
+
+
+```mermaid
+flowchart TD
+
+A["📂 Resume Upload"]
+--> B["Google Drive Folder"]
+
+B --> C["⚙️ n8n Google Drive Trigger"]
+
+C --> D["📥 Download Resume"]
+
+D --> E["📄 Extract PDF Text"]
+
+E --> F["🤖 Google Gemini AI"]
+
+F --> G["📝 Parse JSON Output"]
+
+G --> H{"⭐ Score >= 80?"}
+
+H -->|Yes| I["🏆 Qualified Candidate"]
+
+H -->|No| J["📌 Needs Review"]
+
+I --> K["📊 Google Sheets"]
+
+J --> K
+
+I --> L["📱 Telegram Notification"]
+````
+
+---
+
+# 🏗️ Workflow Implementation
+
+# Workflow 1: AI Resume Evaluation Pipeline
+
+## Node 1 — Google Drive Trigger
+
+### Purpose
+
+Detect newly uploaded resume files.
+
+Configuration:
+
+```
+Trigger:
 Google Drive Trigger
-      │
-      ▼
-Download File
-      │
-      ▼
-Extract From File
-      │
-      ▼
-Google Gemini AI
-      │
-      ▼
-Code Node (Parse JSON)
-      │
-      ▼
-IF (Score ≥ 80?)
- ┌──────────────┐
- ▼              ▼
-Qualified   Needs Review
- │              │
- ▼              ▼
-Google Sheets Google Sheets
- │
- ▼
-Telegram
+
+Event:
+File Created
+
+Folder:
+Job Applications
 ```
 
 ---
 
-# ⚙ Workflow Explanation
+# Node 2 — Download File
 
-## 1. Google Drive Trigger
+### Purpose
 
-Monitors a Google Drive folder for newly uploaded PDF resumes.
+Downloads the uploaded resume from Google Drive for processing.
 
-**Configuration**
+Input:
 
-* Event: File Created
-* Folder: Job Applications
+```
+Resume PDF File
+```
 
----
+Output:
 
-## 2. Download File
-
-Downloads uploaded resumes from Google Drive for processing.
-
----
-
-## 3. Extract From File
-
-Extracts all text content from the uploaded PDF resume.
+```
+Binary PDF Data
+```
 
 ---
 
-## 4. Google Gemini AI
+# Node 3 — Extract From File
 
-Analyzes each resume and evaluates the candidate based on:
+### Purpose
+
+Extracts readable text from PDF resumes.
+
+Example extracted data:
+
+```
+Name:
+John Doe
+
+Education:
+BS Information Technology
+
+Skills:
+Python, Networking, Windows
+
+Experience:
+2 Years IT Support
+```
+
+---
+
+# Node 4 — Google Gemini AI
+
+### Purpose
+
+Analyze resume information and generate candidate evaluation.
+
+Evaluation Criteria:
 
 * Education
 * Technical Skills
@@ -101,177 +185,365 @@ Analyzes each resume and evaluates the candidate based on:
 * Certifications
 * Overall Candidate Quality
 
-### Example AI Output
+Example AI Response:
 
 ```json
 {
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phone": "+63 912 345 6789",
-  "education": "Bachelor of Science in Information Technology",
-  "experience": "2 years IT Support",
-  "skills": [
-    "Networking",
-    "Windows",
-    "Python"
-  ],
-  "certifications": [
-    "CompTIA A+"
-  ],
-  "score": 88,
-  "rank": "Qualified Candidate",
-  "recommendation": "Interview",
-  "summary": "Strong IT support candidate with relevant technical skills."
+"name":"John Doe",
+
+"email":"john@example.com",
+
+"education":
+"Bachelor of Science in Information Technology",
+
+"experience":
+"2 years IT Support",
+
+"skills":[
+"Networking",
+"Python",
+"Windows"
+],
+
+"certifications":[
+"CompTIA A+"
+],
+
+"score":88,
+
+"rank":
+"Qualified Candidate",
+
+"recommendation":
+"Interview",
+
+"summary":
+"Strong IT support candidate with relevant technical skills."
 }
 ```
 
 ---
 
-## 5. Code Node
+# Node 5 — Code Node
 
-Parses the JSON response generated by Google Gemini into structured data that n8n can process.
+### Purpose
+
+Convert AI-generated JSON output into structured n8n data.
+
+Processing:
+
+```
+Gemini Response
+        |
+        ▼
+JSON Parser
+        |
+        ▼
+Structured Candidate Data
+```
 
 ---
 
-## 6. IF Node
+# Node 6 — IF Node
 
-Checks whether the candidate meets the qualification threshold.
+### Purpose
 
-**If True**
+Determine candidate qualification status.
 
-* Save to **Qualified Candidates**
+Condition:
+
+```javascript
+{{$json.score >= 80}}
+```
+
+Branches:
+
+## TRUE
+
+Qualified Candidate
+
+Actions:
+
+* Save candidate data
 * Send Telegram notification
 
-**If False**
+## FALSE
 
-* Save to **Needs Review**
+Needs Review
 
----
+Actions:
 
-## 7. Google Sheets
-
-Stores all evaluated candidates.
-
-### Qualified Candidates
-
-Applicants who achieve a score of **80 or higher**.
-
-### Needs Review
-
-Applicants who score below **80** for further evaluation.
+* Save candidate data
+* No notification
 
 ---
 
-## 8. Telegram
+# Node 7 — Google Sheets
 
-Sends an instant notification whenever a qualified candidate is identified.
+Stores evaluated candidate information.
 
-### Example Notification
+## Qualified Candidates
 
-```text
+Candidates with:
+
+```
+Score >= 80
+```
+
+## Needs Review
+
+Candidates with:
+
+```
+Score < 80
+```
+
+---
+
+# Node 8 — Telegram Notification
+
+Sends recruiter alerts for qualified candidates.
+
+Example:
+
+```
 📄 Qualified Candidate Detected
+
 
 👤 Name:
 John Doe
 
+
 ⭐ Score:
 88 / 100
+
 
 🏆 Rank:
 Qualified Candidate
 
+
 📌 Recommendation:
 Interview
 
+
 📝 Summary:
 Strong IT support candidate with relevant technical skills.
+
 
 🤖 Evaluated automatically using Google Gemini.
 ```
 
 ---
 
-# 📊 Google Sheets Structure
+# 📊 Database Structure
 
-| Timestamp | Name | Email | Phone | Education | Score | Rank | Recommendation | Summary |
-| --------- | ---- | ----- | ----- | --------- | ----: | ---- | -------------- | ------- |
+## Google Sheets — Candidate Evaluation Log
+
+| Field          | Description           |
+| -------------- | --------------------- |
+| Timestamp      | Evaluation date       |
+| Name           | Candidate name        |
+| Email          | Candidate email       |
+| Phone          | Contact number        |
+| Education      | Academic background   |
+| Skills         | Technical skills      |
+| Experience     | Work experience       |
+| Score          | AI evaluation score   |
+| Rank           | Candidate category    |
+| Recommendation | Hiring recommendation |
+| Summary        | AI-generated summary  |
+
+---
+
+# 🔐 Credentials Required
+
+| Service       | Purpose                        |
+| ------------- | ------------------------------ |
+| Google OAuth2 | Google Drive and Sheets access |
+| Gemini API    | AI resume evaluation           |
+| Telegram API  | Notifications                  |
+| n8n Instance  | Workflow execution             |
+
+---
+
+# ⚙️ Setup Guide
+
+## 1. Create Google Drive Folder
+
+Create a folder:
+
+```
+Job Applications
+```
+
+Upload resumes inside this folder.
+
+---
+
+## 2. Configure Google Credentials
+
+Enable:
+
+* Google Drive API
+* Google Sheets API
+
+Connect OAuth credentials inside n8n.
+
+---
+
+## 3. Configure Gemini AI
+
+Add Gemini API credentials:
+
+```
+Google Gemini API Key
+```
+
+Test AI response generation.
+
+---
+
+## 4. Configure Telegram Bot
+
+Steps:
+
+1. Open Telegram
+2. Search BotFather
+3. Create new bot
+4. Copy token
+5. Add credentials in n8n
+
+---
+
+## 5. Import n8n Workflow
+
+Import:
+
+```
+workflow.json
+```
+
+Configure:
+
+* Google Drive folder
+* Google Sheets spreadsheet
+* Gemini API
+* Telegram credentials
+
+Activate workflow.
+
+---
+
+# 🧪 Testing Checklist
+
+| Test Case               | Expected Result            |
+| ----------------------- | -------------------------- |
+| Upload PDF resume       | Workflow starts            |
+| PDF extraction runs     | Resume text generated      |
+| Gemini evaluates resume | Score generated            |
+| Score >= 80             | Telegram notification sent |
+| Score < 80              | Saved as review candidate  |
+| Google Sheets updated   | Candidate logged           |
 
 ---
 
 # 📁 Repository Structure
 
-```text
+```
 AI-Resume-Ranking-System/
+
 │
 ├── README.md
+│
 ├── workflow.json
 │
 ├── screenshots/
+│   │
 │   ├── workflow.png
 │   ├── google-drive-trigger.png
 │   ├── extract-from-file.png
-│   ├── ai-agent-output.png
-│   ├── code-node-output.png
+│   ├── gemini-output.png
+│   ├── code-node.png
 │   ├── if-node.png
 │   ├── google-sheets.png
 │   ├── telegram-notification.png
-│   └── workflow-execution.png
+│   └── execution-result.png
 │
 └── assets/
+    │
     └── sample-output.json
 ```
 
 ---
 
-# 📷 Screenshots
+# 📸 Screenshots
 
-Include the following screenshots:
+Recommended screenshots:
 
-* Complete Workflow
+* Complete n8n Workflow
 * Google Drive Trigger
-* Extract From File Output
-* AI Agent Output
-* Code Node Output
-* IF Node Execution
+* Resume Extraction Output
+* Gemini AI Evaluation
+* JSON Parser Result
+* IF Node Branching
 * Google Sheets Results
 * Telegram Notification
 * Workflow Execution
 
 ---
 
-# 🎯 Learning Objectives
+# 🚀 Future Improvements
+
+| Feature                | Implementation                   |
+| ---------------------- | -------------------------------- |
+| DOCX Resume Support    | Add DOCX parser                  |
+| AI Interview Generator | Generate questions automatically |
+| Candidate Comparison   | AI ranking dashboard             |
+| Email Scheduling       | Gmail integration                |
+| LinkedIn Extraction    | Profile analysis                 |
+| Duplicate Detection    | Resume fingerprinting            |
+| HR Dashboard           | Looker Studio integration        |
+| ATS Integration        | Connect recruitment platforms    |
+
+---
+
+# 🎓 Skills Applied
+
+## Automation
+
+* n8n Workflow Automation
+* Event-driven workflows
+* Process automation
+
+## Artificial Intelligence
+
+* Google Gemini AI
+* Prompt Engineering
+* AI Evaluation Systems
+
+## Programming
+
+* JavaScript
+* JSON Processing
+* Data Transformation
+
+## APIs
+
+* Google Drive API
+* Google Sheets API
+* Telegram Bot API
+
+---
+
+# 📚 Learning Objectives
 
 This project demonstrates:
 
-* Google Drive Automation
-* PDF Text Extraction
-* AI Resume Evaluation
-* Prompt Engineering
-* Structured JSON Parsing
-* Conditional Workflow Logic
-* Google Sheets Automation
-* Telegram Automation
-* AI-Powered Candidate Screening
-
----
-
-# 🚀 Possible Improvements
-
-* Support DOCX resumes
-* Extract portfolio and LinkedIn URLs
-* AI interview question generation
-* Candidate comparison dashboard
-* Automatic email invitations
-* Resume duplicate detection
-* Multi-language resume support
-* HR analytics dashboard
-* Integration with Notion or Airtable
-
----
-
-# 📄 License
-
-This project is licensed under the **MIT License**.
+* Building AI-powered business automation
+* Integrating AI models into workflows
+* Processing documents automatically
+* Creating recruitment automation systems
+* Designing scalable n8n pipelines
 
 ---
 
@@ -292,6 +564,19 @@ This project is licensed under the **MIT License**.
 BS Information Technology Student
 Cebu Technological University (CTU)
 
-GitHub: https://github.com/belioautomation
+GitHub:
 
-This project is part of my **30-Day n8n Automation Portfolio**, showcasing practical AI-powered workflow automation using n8n and Google Gemini.
+[https://github.com/belioautomation](https://github.com/belioautomation)
+
+This project is part of my **30-Day n8n Automation Portfolio**, showcasing practical AI-powered workflow automation using n8n, APIs, JavaScript, and Google Gemini AI.
+
+---
+
+# 📄 License
+
+MIT License
+
+```
+
+This version now matches your **Smart Attendance Monitoring System README style**, making your repositories look like a consistent automation engineer portfolio.
+```
